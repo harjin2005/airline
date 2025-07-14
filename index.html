@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Airline Booking Market Demand</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; }
+        .header { background: linear-gradient(90deg, #2d3e50, #4e73df); color: #fff; padding: 30px 0; }
+        .container { margin-top: 30px; }
+        h1, h2 { margin-bottom: 20px; }
+        .card { margin-bottom: 20px; }
+        #chart { max-width: 900px; margin: 40px auto; }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <h1>Airline Booking Market Demand</h1>
+        <p>Real-Time Insights for Hostel Management</p>
+    </div>
+    <div class="container">
+        <form method="POST" class="mb-4">
+            <label for="origin_filter" class="form-label">Filter by Origin Airport:</label>
+            <select name="origin_filter" id="origin_filter" class="form-select" style="width:auto; display:inline-block;">
+                <option value="All">All</option>
+                {% for airport in popular_origins.values() %}
+                    <option value="{{ airport }}">{{ airport }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary ms-2">Apply</button>
+        </form>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h2>Popular Flight Routes (Last Hour)</h2>
+                    {% if has_data %}
+                        <ul>
+                        {% for route, count in popular_routes.items() %}
+                            <li>{{ route }}: {{ count }} flights</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No flight data available right now. Please try again in a few minutes.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h2>Most Popular Origin Airports</h2>
+                    <ul>
+                    {% for airport in popular_origins.values() %}
+                        <li>{{ airport }}</li>
+                    {% endfor %}
+                    </ul>
+                    <h2>Most Popular Destination Airports</h2>
+                    <ul>
+                    {% for airport in popular_destinations.values() %}
+                        <li>{{ airport }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-3">
+            <h2>Visual Trends</h2>
+            {% if has_data and chartJSON %}
+                <div id="chart"></div>
+                <script>
+                    var plot_data = {{ chartJSON | safe }};
+                    Plotly.newPlot('chart', plot_data.data, plot_data.layout);
+                </script>
+            {% else %}
+                <p>No chart data available.</p>
+            {% endif %}
+        </div>
+
+        <div class="card p-3">
+            <h2>Summary</h2>
+            <ul>
+                <li><strong>Total Flights Analyzed:</strong> {{ total_flights }}</li>
+                <li><strong>Business Insight:</strong>
+                    {% if has_data %}
+                        Focus on routes with highest demand for hostel marketing and partnerships.
+                    {% else %}
+                        No actionable data at this time.
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+
+        <hr>
+        <p class="text-muted text-center" style="font-size: 0.9em;">
+            Data source: OpenSky Network API | Demo for Hostel Market Demand Analysis
+        </p>
+    </div>
+</body>
+</html>
